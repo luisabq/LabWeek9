@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// Generates simple placeholder sprites so the game runs with zero imported assets.
+/// Makes simple sprites when no art is assigned.
 public static class SpriteFactory
 {
     const int Size = 32;
@@ -27,7 +27,7 @@ public static class SpriteFactory
             for (int x = 0; x < Size; x++)
                 tex.SetPixel(x, y, inside(x, y) ? Color.white : Color.clear);
         tex.Apply();
-        // 32 px at 32 pixels-per-unit = exactly 1 world unit
+        // This keeps the sprite one world unit wide.
         return Sprite.Create(tex, new Rect(0, 0, Size, Size), new Vector2(0.5f, 0.5f), Size);
     }
 }

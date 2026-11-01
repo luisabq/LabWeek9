@@ -1,7 +1,6 @@
 using UnityEngine;
 
-/// OBSERVER PATTERN - the observer.
-/// Subscribes to Target.OnTargetHit; Target never references this class.
+/// Tracks the score by listening for target hits.
 public class ScoreManager : MonoBehaviour
 {
     public int Score { get; private set; }
@@ -14,5 +13,12 @@ public class ScoreManager : MonoBehaviour
     {
         Score += points;
         Hits++;
+    }
+
+    /// Restores a score from a save.
+    public void SetScore(int score, int hits)
+    {
+        Score = score;
+        Hits = hits;
     }
 }

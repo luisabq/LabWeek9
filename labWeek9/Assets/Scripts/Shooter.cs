@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// Player-controlled shooter. Takes bullets from the pool (never instantiates them).
+/// Moves the player and fires pooled bullets.
 public class Shooter : MonoBehaviour
 {
     [SerializeField] float moveSpeed = 8f;
@@ -15,13 +15,14 @@ public class Shooter : MonoBehaviour
         var cam = Camera.main;
         float halfWidth = cam.orthographicSize * cam.aspect - 0.6f;
 
+        // S is reserved for saving.
         Vector3 p = transform.position;
         p.x = Mathf.Clamp(p.x + GameInput.Horizontal() * moveSpeed * Time.deltaTime, -halfWidth, halfWidth);
         transform.position = p;
 
         if (GameInput.FireHeld() && Time.time >= nextFire)
         {
-            // Get() returns null when the pool is empty, so the player waits for a bullet to come back
+            // Wait if every bullet is already in flight.
             if (pool.Get(transform.position + Vector3.up * 0.7f) != null)
                 nextFire = Time.time + fireCooldown;
         }

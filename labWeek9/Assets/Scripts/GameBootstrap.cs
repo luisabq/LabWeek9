@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// Put this on ONE empty GameObject in an empty scene. It builds the whole game at runtime.
-/// Optional: drag Kenney sprites into the slots below to replace the placeholder shapes.
+/// Add this to one empty object to build the game at runtime.
+/// Assign sprites below if you want to replace the placeholders.
 public class GameBootstrap : MonoBehaviour
 {
     [Header("Optional sprites (leave empty for placeholders)")]
@@ -31,12 +31,12 @@ public class GameBootstrap : MonoBehaviour
         Sprite circle = SpriteFactory.Circle();
         Sprite tri = SpriteFactory.Triangle();
 
-        // ---- Object Pool ----
+        // Set up the bullet pool.
         Bullet bulletTemplate = MakeBulletTemplate(bulletSprite != null ? bulletSprite : circle);
         var pool = new GameObject("BulletPool").AddComponent<BulletPool>();
         pool.Initialize(bulletTemplate, poolSize);
 
-        // ---- Shooter ----
+        // Set up the player.
         var shooterGO = new GameObject("Shooter");
         var sr = shooterGO.AddComponent<SpriteRenderer>();
         sr.sprite = shooterSprite != null ? shooterSprite : tri;
@@ -45,8 +45,9 @@ public class GameBootstrap : MonoBehaviour
         shooterGO.transform.localScale = new Vector3(1.1f, 1.1f, 1f);
         shooter = shooterGO.AddComponent<Shooter>();
         shooter.Setup(pool);
+        shooterGO.AddComponent<TransformSaver>().SetSaveID("Player"); // Save the player.
 
-        // ---- Builder (spawner uses the Director) ----
+        // Set up target building and spawning.
         Target targetTemplate = MakeTargetTemplate();
         spawner = new GameObject("TargetSpawner").AddComponent<TargetSpawner>();
         spawner.Setup(targetTemplate, new[]
@@ -56,11 +57,15 @@ public class GameBootstrap : MonoBehaviour
             bearSprite != null ? bearSprite : square
         });
 
-        // ---- Observer ----
+        // Listen for target hits.
         var score = new GameObject("ScoreManager").AddComponent<ScoreManager>();
 
-        // ---- HUD ----
-        new GameObject("HUD").AddComponent<GameHUD>().Setup(score, pool, this);
+        // Set up saving and loading.
+        var saveLoad = new GameObject("SaveLoadManager").AddComponent<SaveLoadManager>();
+        saveLoad.Setup(spawner, score, this);
+
+        // Add the score display.
+        new GameObject("HUD").AddComponent<GameHUD>().Setup(score, pool, this, saveLoad);
     }
 
     void Update()
@@ -121,6 +126,7 @@ public class GameBootstrap : MonoBehaviour
         var rb = go.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
         go.AddComponent<BoxCollider2D>().isTrigger = true;
+        go.AddComponent<TransformSaver>(); // Save each target.
         return go.AddComponent<Target>();
     }
 }

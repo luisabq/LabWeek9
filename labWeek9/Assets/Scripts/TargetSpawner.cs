@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// Spawns random target types from the side of the screen using the TargetDirector.
+/// Spawns random targets from the side of the screen.
 public class TargetSpawner : MonoBehaviour
 {
     [SerializeField] float interval = 0.9f;
@@ -14,6 +14,10 @@ public class TargetSpawner : MonoBehaviour
         sprites = targetSprites;
     }
 
+    /// Builds one target of the requested kind.
+    public Target Spawn(TargetDirector.Kind kind, Vector3 pos, int dir) =>
+        TargetDirector.Build(kind, template, pos, dir, sprites);
+
     void Update()
     {
         timer -= Time.deltaTime;
@@ -26,12 +30,12 @@ public class TargetSpawner : MonoBehaviour
         float y = Random.Range(0.3f, cam.orthographicSize - 1.5f);
         Vector3 pos = new Vector3(-dir * edge, y, 0f);
 
-        // weighted: ducks common, birds medium, bears less common
+        // Ducks are common, birds less common, and bears rare.
         float r = Random.value;
         var kind = r < 0.5f ? TargetDirector.Kind.Duck
                  : r < 0.8f ? TargetDirector.Kind.FastBird
                             : TargetDirector.Kind.Bear;
 
-        TargetDirector.Build(kind, template, pos, dir, sprites);
+        Spawn(kind, pos, dir);
     }
 }

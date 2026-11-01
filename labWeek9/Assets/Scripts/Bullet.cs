@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// A pooled projectile. It is never destroyed: it returns itself to the BulletPool.
+/// Bullet reused by the pool instead of destroyed.
 public class Bullet : MonoBehaviour
 {
     [SerializeField] float speed = 12f;
@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour
     {
         transform.Translate(Vector3.up * speed * Time.deltaTime);
 
-        // Check for a hit against every live target
+        // Check the live targets for a hit.
         for (int i = Target.Active.Count - 1; i >= 0; i--)
         {
             Target t = Target.Active[i];
@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour
             }
         }
 
-        // Left the top of the screen -> give it back to the pool
+        // Return it once it leaves the screen.
         var cam = Camera.main;
         if (transform.position.y > cam.transform.position.y + cam.orthographicSize + 1f)
             ReturnToPool();

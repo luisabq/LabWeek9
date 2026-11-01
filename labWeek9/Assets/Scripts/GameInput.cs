@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-/// Small wrapper so the game works with the old Input Manager OR the new Input System.
+/// Keeps input working with either Unity input system.
 public static class GameInput
 {
     public static float Horizontal()
@@ -37,6 +37,26 @@ public static class GameInput
         return k != null && k.rKey.wasPressedThisFrame;
 #else
         return Input.GetKeyDown(KeyCode.R);
+#endif
+    }
+
+    public static bool SavePressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        var k = Keyboard.current;
+        return k != null && k.sKey.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.S);
+#endif
+    }
+
+    public static bool LoadPressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        var k = Keyboard.current;
+        return k != null && k.lKey.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.L);
 #endif
     }
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
 
-/// BUILDER PATTERN
-/// Fluent builder: chain setters, then call Build() to get a fully configured Target.
+/// Builds a target from a few settings.
 public class TargetBuilder
 {
     float speed = 2f;

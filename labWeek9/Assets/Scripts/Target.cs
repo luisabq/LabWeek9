@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// The product built by TargetBuilder. Also the SUBJECT of the OBSERVER pattern:
-/// when a bullet hits it, it raises OnTargetHit and doesn't know who is listening.
+/// A target made by TargetBuilder.
+/// It reports hits without knowing who listens.
 public class Target : MonoBehaviour
 {
-    /// OBSERVER PATTERN: static event that observers (ScoreManager) subscribe to.
+    /// ScoreManager listens for this event.
     public static event Action<int> OnTargetHit;
 
-    /// All live targets, so bullets can check for hits.
+    /// The targets currently in the scene.
     public static readonly List<Target> Active = new List<Target>();
+
+    public TargetDirector.Kind Kind { get; set; }
+    public int Direction => direction;
 
     float speed;
     int direction = 1;
@@ -37,7 +40,7 @@ public class Target : MonoBehaviour
 
         var cam = Camera.main;
         float limit = cam.orthographicSize * cam.aspect + 2f;
-        if (Mathf.Abs(transform.position.x) > limit) Destroy(gameObject); // escaped, no points
+        if (Mathf.Abs(transform.position.x) > limit) Destroy(gameObject); // Escaped, so no points.
     }
 
     public bool Overlaps(Vector3 point, float radius)
@@ -51,8 +54,16 @@ public class Target : MonoBehaviour
     {
         if (dead) return;
         dead = true;
-        OnTargetHit?.Invoke(points);   // notify observers
-        bullet.ReturnToPool();         // bullet goes back to the pool
+        OnTargetHit?.Invoke(points);   // Tell the score manager.
+        bullet.ReturnToPool();         // Reuse the bullet.
+        Destroy(gameObject);
+    }
+
+    /// Removes the target without adding points.
+    public void Discard()
+    {
+        dead = true;
+        Active.Remove(this);
         Destroy(gameObject);
     }
 }

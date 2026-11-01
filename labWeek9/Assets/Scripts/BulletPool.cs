@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// OBJECT POOL PATTERN
-/// Pre-creates a fixed number of bullets. Shooting = Get(), bullet finished = Release().
-/// No Instantiate/Destroy happens while the game is running.
+/// Reuses a fixed set of bullets during play.
 public class BulletPool : MonoBehaviour
 {
     readonly Queue<Bullet> available = new Queue<Bullet>();
@@ -25,7 +23,7 @@ public class BulletPool : MonoBehaviour
         }
     }
 
-    /// Returns null if every bullet is currently in flight (pool exhausted).
+    /// Returns null when every bullet is in use.
     public Bullet Get(Vector3 position)
     {
         if (available.Count == 0) return null;
